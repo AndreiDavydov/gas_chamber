@@ -5,18 +5,19 @@ import src
 
 
 def convert_float_vals_to_images(frames):
+    frames = frames.astype(np.float32)
     min_ = frames.min()
     max_ = frames.max()
     frames = (frames - min_) / (max_ - min_)
     frames = (frames * 255).astype(np.uint8)
     return frames
 
-def write_frames(frames, out_path):
+def write_frames(frames, out_path, **kwargs):
     """
     Same as src.video_utils.write_video but with normalization
     """
     v = convert_float_vals_to_images(frames)
-    src.video_utils.write_video(v, out_path)
+    src.video_utils.write_video(v, out_path, **kwargs)
     return
 
 def vis_mask(img, mask, points, out_path):
