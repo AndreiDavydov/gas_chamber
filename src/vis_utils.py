@@ -21,22 +21,19 @@ def vis_grid(frames, r=5, c=5):
     return fig
 
 
-def blend_w_future_masks(background_video, masks, num_future=5, alpha=0.4):
+def blend_w_masks(background_video, masks, num_future=5, alpha=0.4, num_colors_total=30):
     """
     Blend the masks with the background image.
 
-    Take only the first num_future frames from the masks. Blend them with the bakcground image using different colors.
+    Take only the first num_future frames from the masks. Blend them with the background image using different colors.
     The blending is done by superimposing the masks on the background image, using the alpha parameter to control the blending.
-    The masks colored in rainbow colors.
+    The masks colored in rainbow colors. Total number of colors is num_colors_total. The colors are assigned in a cyclic manner
 
     background : np.array, rgb image : N x H x W x 3
     masks : np.array, masks of the video, stack of binary arrays, (N-1) x H x W
-
-    For a new frame, colors must roll with the increment of 1, so that the masks on previous frames are colored in the same color.
     """
     # Create a color map
-    num_colors = 30
-    cmap = plt.get_cmap('hsv', num_colors)
+    cmap = plt.get_cmap('hsv', num_colors_total)
 
     blended_video = np.zeros_like(background_video)
 
@@ -45,8 +42,8 @@ def blend_w_future_masks(background_video, masks, num_future=5, alpha=0.4):
         frame = background_video[idx].copy()
         masks_idx = masks[idx:]
         
-        start_color = idx % num_colors
-        colors = (np.arange(start_color, start_color + num_colors) % num_colors)[:num_future]
+        start_color = idx % num_colors_total
+        colors = (np.arange(start_color, start_color + num_colors_total) % num_colors_total)[:num_future]
         for mask_i, mask in enumerate(masks_idx):
             color = cmap(colors[mask_i])[:3]
             color = np.array(color).reshape(1, 1, 3)
